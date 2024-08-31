@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Geisternetz Verwaltung</title>
+</h:head>
+<h:body>
+    <h1>Geisternetz Verwaltung</h1>
+
+    <!-- Formular zum Hinzufügen eines neuen Geisternetzes -->
+    <h:form>
+        <h:panelGrid columns="2">
+            <h:outputLabel for="standort" value="Standort (GPS-Koordinaten):" />
+            <h:inputText id="standort" value="#{geisternetz.standort}" />
+
+            <h:outputLabel for="groesse" value="Größe (in m²):" />
+            <h:inputText id="groesse" value="#{geisternetz.groesse}" />
+
+            <h:outputLabel for="status" value="Status:" />
+            <h:selectOneMenu id="status" value="#{geisternetz.status}">
+                <f:selectItem itemValue="Gemeldet" itemLabel="Gemeldet" />
+                <f:selectItem itemValue="Bergung bevorstehend" itemLabel="Bergung bevorstehend" />
+                <f:selectItem itemValue="Geborgen" itemLabel="Geborgen" />
+                <f:selectItem itemValue="Verschollen" itemLabel="Verschollen" />
+            </h:selectOneMenu>
+        </h:panelGrid>
+
+        <h:commandButton value="Netz hinzufügen" action="#{geisternetz.addNetz}" />
+    </h:form>
+
+    <!-- Visuelle Trennung -->
+    <hr />
+
+    <!-- Tabelle zur Anzeige der Geisternetze -->
+    <h:dataTable value="#{geisternetz.netzListe}" var="netz" border="1">
+        <h:column>
+            <f:facet name="header">Standort (GPS-Koordinaten)</f:facet>
+            <h:outputText value="#{netz.standort}" />
+        </h:column>
+        <h:column>
+            <f:facet name="header">Größe (in m²)</f:facet>
+            <h:outputText value="#{netz.groesse}" />
+        </h:column>
+        <h:column>
+            <f:facet name="header">Status</f:facet>
+            <h:outputText value="#{netz.status}" />
+        </h:column>
+    </h:dataTable>
+</h:body>
+</html>
+
+
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+@Named("geisternetz")
+@SessionScoped
+public class Geisternetz implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private String standort;
+    private double groesse;
+    private String status;
+
+    private List<Geisternetz> netzListe = new ArrayList<>();
+
+    // Getter und Setter für die Eigenschaften
+    public String getStandort() {
+        return standort;
+    }
+
+    public void setStandort(String standort) {
+        this.standort = standort;
+    }
+
+    public double getGroesse() {
+        return groesse;
+    }
+
+    public void setGroesse(double groesse) {
+        this.groesse = groesse;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public List<Geisternetz> getNetzListe() {
+        return netzListe;
+    }
+
+    // Methode zum Hinzufügen eines neuen Geisternetzes
+    public void addNetz() {
+        if (standort != null && !standort.isEmpty() && groesse > 0) {
+            // Hinzufügen des aktuellen Geisternetzes zur Liste
+            netzListe.add(new Geisternetz(standort, groesse, status));
+            // Felder zurücksetzen
+            standort = "";
+            groesse = 0.0;
+            status = "";
+        }
+    }
+
+    // Konstruktor für das Hinzufügen von Geisternetzen zur Liste
+    private Geisternetz(String standort, double groesse, String status) {
+        this.standort = standort;
+        this.groesse = groesse;
+        this.status = status;
+    }
+
+    // Standard-Konstruktor
+    public Geisternetz() {
+    }
+}
